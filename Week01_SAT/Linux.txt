@@ -1,1 +1,45 @@
+리눅스 명령어 - 후반부
+서버
+클라이언트
+윈도우10 윈도우 클라이언트
 
+명령어 다 외울필욘 없다
+
+설치:
+Vmware pro 버전 17
+	: 날짜 제한 (돈내야됨)>> 시리얼 코드 공유
+	: 스냅숏+nat통한ip 설정(192.168.111.0-255)
+Vmware player 버전 17
+	:Server ) Ubuntu 데스크탑 64비트
+	:ServerB ) Ubuntu 서버버전 64비트
+	:client) KUbuntu 데스크탑 64비트
+	:WinClient ) Window10
+
+c:\Ubuntu20.04\
+	Server
+	Server(B)
+	Client
+	WinClient
+
+1회차공유
+	ISO 프리웨어 : 파일을 묶어줌
+	SecurAble : Vmware 설치 가능한환경인지 체크해주는 프로그램
+		https://www.grc.com/securable.htm 에서 다운 가능
+	VmwareWorkstation: 다운로드 받을 수 있는거
+
+환경설정
+	: 공유 파일 c:\ 에 저장해라
+
+실습환경구축
+	:개인적으론 하드디스크, SSD(메모리카드) , 파티션(하드디스크를 직사각형모양으로 논리적으로 나눈것>> c드라이브도 그 중 하나임) 에 설치가능
+	:업무에선 1대 컴터에 리눅스 하나만 설치(window 같은것도 없음)
+		: 부트로더(:라눅스만 설치)
+		: vmware 솦웨어>> 연습위해 가상의컴터만든다 (실제로 윈도우 못지우니)
+			: config 
+			c:\Ubuntu20.04\
+				Server
+				Server(B)
+				Client
+				WinClient
+			4개로 나눈거 클릭함 각 환경실행되게 하자
+	: 
