@@ -1,16 +1,5 @@
-
-player 에서 엑스 누르고 suspend 하는거랑 suspend guest 버튼 누르는거랑 같은거임?
-
-
-
-리눅스 명령어 - 후반부
-서버
-클라이언트
-윈도우10 윈도우 클라이언트
-
-명령어 다 외울필욘 없다
-
 설치:
+
 Vmware pro 버전 17
 	: 날짜 제한 (돈내야됨)>> 시리얼 코드 공유
 	: 스냅숏+nat통한 ip 설정(192.168.111.0-255)
@@ -20,41 +9,71 @@ Vmware player 버전 17
 	:client) KUbuntu 데스크탑 64비트
 	:WinClient ) Window10
 
-c:\Ubuntu20.04\
-	Server
-	Server(B)
-	Client
-	WinClient
 
-1회차공유
+
+
+실습환경구축
+	:개인적으론 파티션(하드디스크 나 SSD를 직사각형모양으로 논리적으로 나눈것>> c드라이브도 그 중 하나임) 에 멀티부팅 되게 윈도우와 리눅스를 설치 가능
+		: 멀티부팅 = 실제로 하드디스크 파티션 나누어 각 파티션 별로 하나의 운영체제만 가동할 수 있는 환경
+	:업무에선 1대 컴터에 리눅스 하나만 설치(window 같은것도 없음)
+		: 부트로더(:라눅스만 설치)
+		: vmware 솦웨어>> 이런 환경을 연습하기 위해 가상의 컴터만든다 (실제로 내 컴터서 윈도우 지우긴 아까우니까)
+			: 4개의 가상 컴터
+				c:\LinuxStudy\Ubuntu20.04\
+					Server
+					Server(B)
+					Client
+					WinClient
+
+
+용어 정리
+	: 가상머신 != 멀티부팅
+		: 멀티부팅 ) 실제로 하드디스크 파티션 나눈거. 각 파티션 별로 하나의 운영체제만 가동할 수 있는 환경
+		: 가상머신) 프로그램 통해  만든 가상의 컴퓨터 생성한것. 동시에 여러개의 운영체제 가동 가능
+
+	:host pc) 자원 나눠주는 컴터. 내가 실제로 쓰고 있는 컴터.
+	:guest pc) 자원 갖다 쓰는 컴터.  ( host pc의 물리적자원(메모리)을 빌려써서 그 위에 ) 우리가 Vmware 통해 만든 가상컴터
+		 
+	: IP 
+		: 각 컴터의 고유의 주소
+		: NIC (네트워크 카드)와 소통 필요
+	: 프로세스) 물리적인거. cpu 같은거
+	: 프로세서) 일처리할 수 있는 경로
+
+
+1회차공유자료)
 	ISO 프리웨어 : 파일을 묶어줌	
 		: 걍 iso 파일 만드는 거 암거나 다운함됨.
 	SecurAble : Vmware 설치 가능한환경인지 체크해주는 프로그램
 		https://www.grc.com/securable.htm 에서 다운 가능
-	VmwareWorkstation: 다운로드 받을 수 있는거
+	VmwareWorkstation: 가상 컴터 만드는 프로그램
 		: https://www.vmware.com/products/workstation-pro.html 다운
 		: 자바 프로그램이랑 같음. 물리적인 접근을 함(Rom). cpu를 나눠줌. FIFO 방식으로. 시간차를 두고.
 환경설정
-		:라이선스키 (VMware Workstation Pro 17 License Key May 2023)
-			HA2W0-8731Q-MJ8W0-133ZK-8P0HD
-			4C21U-2KK9Q-M8130-4V2QH-CF810
-			JU090-6039P-08409-8J0QH-2YR7F
-			NZ4RR-FTK5H-H81C1-Q30QH-1V2LA
-			4A4RR-813DK-M81A9-4U35H-06KND
-			4Y09U-AJK97-089Z0-A3054-83KLA
-			MC60H-DWHD5-H80U9-6V85M-8280D
-			JA0T2-A53E5-HJ1Z1-0T2Z0-C6RP8
+		
 		: workstation pro ) 유료버전 
-			: snap short 스냅숏 기능) 
-				: 복원위치저장기능. 카메라처럼 찍어서 원하는 시점으로 복구 가능
+			:라이선스 키 (VMware Workstation Pro 17 License Key May 2023) (크랙임)
+				HA2W0-8731Q-MJ8W0-133ZK-8P0HD
+				4C21U-2KK9Q-M8130-4V2QH-CF810
+				JU090-6039P-08409-8J0QH-2YR7F
+				NZ4RR-FTK5H-H81C1-Q30QH-1V2LA
+				4A4RR-813DK-M81A9-4U35H-06KND
+				4Y09U-AJK97-089Z0-A3054-83KLA
+				MC60H-DWHD5-H80U9-6V85M-8280D
+				JA0T2-A53E5-HJ1Z1-0T2Z0-C6RP8
+
+			: pro 버전 장점) snap shot 스냅숏 기능 포함 
+				snap shot 기능: 백업기능. 카메라처럼 찍어서 원하는 시점으로 복구 가능
+
 			: edit-VirtualNetworkEditor
-				:VMnet8 클릭 후 change setting
+				: VMnet8 클릭 후 change setting
 					:또 VMnet8 클릭후 subnet Ip 3번째 값 바꿈
 				: type
 					NAT ) 넷트웍 어드레스 트렌지션
 						: 주소 변환
 						: 가짜 IP를 진짜 Ip에 씌워서 보내줌
 							: 외부에서 안으로는 못오는데 안에서 외부로는 가능
+
 		: WorkStation player) 무료버전
 			1. New virtual 위져드) 설치 방식 >> 마지막꺼 택
 				dvd 방식
@@ -196,31 +215,9 @@ https://cdimage.ubuntu.com/kubuntu/releases/20.04/release/   에서 	kubuntu-20.
 
 apt (Advansed Package Tool) : 패키지 관리 도구
 
-실습환경구축
-	:개인적으론 하드디스크, SSD(메모리카드) , 파티션(하드디스크를 직사각형모양으로 논리적으로 나눈것>> c드라이브도 그 중 하나임) 에 설치가능
-	:업무에선 1대 컴터에 리눅스 하나만 설치(window 같은것도 없음)
-		: 부트로더(:라눅스만 설치)
-		: vmware 솦웨어>> 연습위해 가상의컴터만든다 (실제로 윈도우 못지우니)
-			: config 
-			c:\Ubuntu20.04\
-				Server
-				Server(B)
-				Client
-				WinClient
-			4개로 나눈거 클릭함 각 환경실행되게 하자
+
+			
 
 각 게스트 pc 에 가상 ip를 부여하고 이가 빠져나갈 수 있도록 dns 를 만들어서 빠져 나가야된다
 
-용어 정리
-	: 가상머신 != 멀티부팅
-		: 멀티부팅 ) 실제로 하드디스크 파티션 나누는거
-		: 가상머신) 윈도우 띄어놓고 프로그램 통해 가상의 환경 생성
 
-	:host pc) 자원 나눠주는 자리
-	:guest pc) 자원 갖다 쓰는 컴터
-		: 우리가 만든 가상컴터(Vmware)
-	: IP 
-		: 각 컴터의 고유의 주소
-		: NIC (네트워크 카드)와 소통 필요
-	: 프로세스) 물리적인거. cpu 같은거
-	: 프로세서) 일처리할 수 있는 경로
