@@ -1,0 +1,478 @@
+
+질문: 
+==================
+설치:
+
+Vmware pro 버전 17
+	: 날짜 제한 (돈내야됨)>> 시리얼 코드 공유
+	: 스냅숏+nat통한 ip 설정(192.168.111.0-255)
+Vmware player 버전 17
+	:Server ) Ubuntu 데스크탑 64비트
+	:ServerB ) Ubuntu 서버버전 64비트
+	:client) KUbuntu 데스크탑 64비트
+	:WinClient ) Window10
+
+
+
+
+실습환경구축
+	:개인적으론 파티션(하드디스크 나 SSD를 직사각형모양으로 논리적으로 나눈것>> c드라이브도 그 중 하나임) 에 멀티부팅 되게 윈도우와 리눅스를 설치 가능
+		: 멀티부팅 = 실제로 하드디스크 파티션 나누어 각 파티션 별로 하나의 운영체제만 가동할 수 있는 환경
+	:업무에선 1대 컴터에 리눅스 하나만 설치(window 같은것도 없음)
+		: 부트로더(:라눅스만 설치)
+		: vmware 솦웨어>> 이런 환경을 연습하기 위해 가상의 컴터만든다 (실제로 내 컴터서 윈도우 지우긴 아까우니까)
+			: 4개의 가상 컴터
+				c:\LinuxStudy\Ubuntu20.04\
+					Server
+					Server(B)
+					Client
+					WinClient
+
+
+용어 정리
+	: 가상머신 != 멀티부팅
+		: 멀티부팅 ) 실제로 하드디스크 파티션 나눈거. 각 파티션 별로 하나의 운영체제만 가동할 수 있는 환경
+		: 가상머신) 프로그램 통해  만든 가상의 컴퓨터 생성한것. 동시에 여러개의 운영체제 가동 가능
+
+	:host pc) 자원 나눠주는 컴터. 내가 실제로 쓰고 있는 컴터.
+	:guest pc) 자원 갖다 쓰는 컴터.  ( host pc의 물리적자원(메모리)을 빌려써서 그 위에 ) 우리가 Vmware 통해 만든 가상컴터
+		 
+	: IP 
+		: 각 컴터의 고유의 주소
+		: NIC (네트워크 카드)와 소통 필요
+	: 프로세스) 물리적인거. cpu 같은거
+	: 프로세서) 일처리할 수 있는 경로
+
+
+1회차공유자료)
+	ISO 프리웨어 : 파일을 묶어줌	
+		: 걍 iso 파일 만드는 거 암거나 다운함됨.
+	SecurAble : Vmware 설치 가능한환경인지 체크해주는 프로그램
+		https://www.grc.com/securable.htm 에서 다운 가능
+	VmwareWorkstation: 가상 컴터 만드는 프로그램
+		: https://www.vmware.com/products/workstation-pro.html 다운
+		: 자바 프로그램이랑 같음. 물리적인 접근을 함(Rom). cpu를 나눠줌. FIFO 방식으로. 시간차를 두고.
+환경설정
+		: 왜 쓰는가
+			한 컴터 내에서 여러개의 가상 컴터 생성
+				: 하드웨어 맘대로 설정 가능
+				: 운영체제 다양하게 할 수 있음
+				: 실제로 하기 전에 테스트 용으로 좋음
+
+		: workstation pro ) 유료버전 
+			:라이선스 키 (VMware Workstation Pro 17 License Key May 2023) (크랙임)
+				HA2W0-8731Q-MJ8W0-133ZK-8P0HD
+				4C21U-2KK9Q-M8130-4V2QH-CF810
+				JU090-6039P-08409-8J0QH-2YR7F
+				NZ4RR-FTK5H-H81C1-Q30QH-1V2LA
+				4A4RR-813DK-M81A9-4U35H-06KND
+				4Y09U-AJK97-089Z0-A3054-83KLA
+				MC60H-DWHD5-H80U9-6V85M-8280D
+				JA0T2-A53E5-HJ1Z1-0T2Z0-C6RP8
+
+			: pro 버전 장점) 
+				1. snap shot 기능 포함: 백업기능. 카메라처럼 찍어서 원하는 시점으로 복구 가능
+				2. nat통한 ip 설정 가능 ( 실습은 192.168.111.0-255로 설정)
+
+				: edit-VirtualNetworkEditor
+					: VMnet8 클릭 후 change setting
+						:또 VMnet8 클릭후 subnet Ip 3번째 값 바꿈
+					: type
+						NAT ) 넷트웍 어드레스 트렌지션
+							: 주소 변환
+							: 가짜 IP를 진짜 Ip에 씌워서 보내줌
+								: 외부에서 안으로는 못오는데 안에서 외부로는 가능
+
+			: 일단 Nat 기능을 쓰던 snap shot 기능을 쓰던 VMware workstation player은 모두 완전 종료된 상태여야됨
+				:그리고 사용에 앞서  VMware workstation player 에서 만들어놨던 가상머신 불러오기
+
+			: NAT 기능 : ip주소 설정하기
+				: 네트워크 관련 세팅해야하는 정보
+					
+
+					: 주소값
+						1. IP 주소
+							: 192.168.XXX.3 ~192.168.XXX.254 가능
+
+							: 실습구조
+								: host os (아래 2개값 모두 가지고 있는거임)
+									1. 자동할당된 가상 ip 값  >> 192.168.111.1
+									2. 실제로 사용하는 ip 주소
+		
+								: gate way, dns 서버
+									: 가상 ip 값 >> 162.168.111.2 로 통일
+		
+								: DHCP 서버
+									: 가상 ip 값 >> 162.168.111.254
+		
+								: 우리가 만든 가상머신들
+									1. server 
+										: 고정 ip 값 >> 162.168.111.100
+									2. server(b)
+										: 고정 ip 값 >> 162.168.111.200
+									3. client
+										:  (DHCP서버에 의해) 자동으로  할당받은 ip 값
+									4. winclient
+										:  (DHCP서버에 의해) 자동으로  할당받은 ip 값
+
+
+						2. 서브넷마스크주소
+							: 어디서나 기본적으론 255.255.255.0 임
+						3. 게이트웨이주소
+							: 192.168.XXX.2
+								: IP 주소와 다르게 설정
+						4. DNS 서버 주소
+							: 게이트웨이 주소랑 같게 설정
+
+				: 내 찐 컴터의 cmd 창서
+					ipconfig /all 하기: 네트워크 주소와 관련된 정보 확인 가능
+						: 이더넷 어댑터 VMware Netwwork Adapter Vmnet8 란의
+							IPv4 주소 확인 가능
+
+				: edit - virtual network editor - VMnet8 클릭 후 change setting
+					: subnet IP 에서 3번째의 3자리를 원하는 숫자로 변경(예제에선 111)
+						: 나머지 자리는 건들지x
+
+
+		: WorkStation player) 무료버전
+			: 가상컴터 생성, 키고 끄는데 사용
+
+			: 가상 컴터 생성 하는 방법
+				1. 초기 화면
+					: home 버튼이 선택된 상태에서 오른쪽의 create a a new virtual machine 을 클릭
+
+				2. welcome to the new virtual machine wizard 창 : guest운영체제를 설치하는 방법 택하는 창
+					: disk, iso , install later 중 install later 택 >> 일단 빈 공간에 가상컴터를 만들고 나중에 운영체제를 설치하겠단 뜻
+ 
+				3. Select a Guest Operation System : guest OS 정하기
+					: Microsoft Windows, Linux, Other 중 하나 택
+						:나중에 설치될 guest os 의 종류 
+					: os의 여러 버전 중 하나 택 >> window 의 경우 window10 ,  window11-64bit ,...우분투의 경우 Ubuntu 64-bit 이런거 
+
+				4. Name the Virtual Machine 
+					: 가상 컴터 이름 짓기 
+					: 가상 컴터가 저장될 경로 지정 
+						: 되도록이면 가상컴터의 이름과 같은 폴더를 만들고 그 안에 저장하는걸 추천(가상 컴터 만든다고 가상컴터명으로 자동으로 폴더가 만들어지는게 아니라 직접 만들어야됨) 
+
+				5. Specify Disk Capacity 창: 만들 "가상 컴터"의 "host pc"의 용량 정하는 창 
+					: 용량 지정
+					: Store as a single file, split into multiple files 중에서 single file 택
+
+				6. Ready to Create Virtual Machine 창: 최종적으로 만들어진 가상 컴터의 스펙 보여줌
+			: 가상 컴터 생성 이후 가상 컴터 스펙 수정하는 법 - 가상컴터 선택 후 edit virtual machine setting 택		
+
+			: 가상 컴터의 스펙 사항
+				1. memory : 
+					: Memory for this virtual machine == 호스트 pc의 용량 
+						:1024, 2048, 3096 ,4096..MB 단위. 즉, 1024*n . (1024MB == 1GB )
+
+					: 그 밑의 오르락 내리락 키 재는 거 같은 거 == 게스트 pc의 용량
+						: 기본적으론 호스트 pc 용량의 50 퍼센트 할당하는걸 추천함
+
+				2. Processors	
+					: cpu를 의미
+					: host pc 에 멀티코어 설치되어있으면 2개 이상해도 좋지만 그렇지 않음 걍 1개로 설정
+				3. Harddisk(SCSI) 	
+					: ?
+
+				4. [ cd/dvd ](SATA)	
+					: 가상머신에 cd/dvd 를 장착
+					: 사용방식
+						case1 : host pc에 부착된 cd/dvd 장치를 그대로 사용 
+						case2 : 파일로 제작된 iso파일을 cd/dvd 처럼 사용
+
+				5. Network Adapter
+					: 기본설정은 NAT(network Adress Transaltion)
+						: 네트워크 주소 변환(IP주소 변환) >> 여러장치가 하나의 공인 ip 주소를 공유 가능
+							: IP주소 변환) 
+								case1.사설 IP 주소 -->  공인 IP  변환  
+								case2.공인 IP 주소 -->  사설 IP  변환  
+
+						: 가정, 기업 네트워크서 사용되며 IPv4 주소 부족문제를 해결하고 보안을 강화하기 위한 도구 중 하나
+					
+
+		: .vmdk 파일 == 가상하드디스크 파일
+				: virtualmachinedisk 약자 
+				: 가상머신의 모든 종합적 정보를 가직고 있다.
+
+
+		: 만약 잘못하고 삭제하면 
+			: open a virtual machine 버튼 누르고 삭제한 파일(.vmx 확장자) 누름 복원됨 
+
+
+		: 유용한단축키
+			: ctrl +alt >> 마우스 커서 바깥으로 빠져나옴
+			: CTRL + ALT + INSERT	 >>  재부팅
+		: 여러 모드
+			SUSPEND 모드 (== 일시정지)
+					: 완전히 power off 한게 아니라 잠깐 꺼둔것.
+					: 미리보기 창에서 화면 활성화 되어있는것 볼 수 있음
+					: 걍 power off 하는것보단 이렇게 하는걸 추천 (부팅이 더 빠름)
+			
+			: 재부팅 하려면 CTRL + ALT + INSERT
+
+		: power on 시 뜨는 문구
+			: operating System not found
+				: 운영체제가 설치되지 않은 상태
+			: power off 에서
+				power off : 안전하게 종료
+				suspend guest : 
+				restart guest : 재실행
+ 					ROM-BIOS(RW) (read only memory) 
+						: 하드웨어 세팅 )restart guest 후 F2 누름
+
+
+
+		: host os 와 guest os 간의 파일 전송 방법
+			: host os 에 있는 파일을 guest os 로 복사해야 하는 경우
+				: host os 에서 보낼 파일을 iso 파일로 만들고 guest os 의 cd/dvd탭에  넣어줌
+					: VMware 는 물리적인 cd /dvd 뿐 아니라 iso 파일도 cd/dvd 와 동일하게 사용할 수 있기 때문
+					: iso 파일 
+						: 확장명이 .iso 인 파일
+						: cd, dvd 의 내용을 하나의 파일로 제작해 놓은 것.
+						: 일반적인 파일을 iso파일로 만드는 법
+							: iso 파일을 만들어주는 소프트웨어 사용
+								source folder : iso 파일로 변환하고자하는 디렉토리 선택
+								volume name: iso 파일의 이름 설정
+								iso file : iso 파일이 저장될 위치
+						: 아니면 아예 사이트에서 iso 파일 자체를 다운 받을 수 있다
+							iso 파일 다운로드:  
+
+								1번)Server >>Ubuntu Desktop을 GNOME 그래픽 환경으로 설치
+									http://old-releases.ubuntu.com/releases/20.04.0/ubuntu-20.04-desktop-amd64.iso
+
+
+								2번)Server(B) >>Ubuntu Server를 텍스트 환경으로 설치
+
+									http://old-releases.ubuntu.com/releases/20.04.0/ubuntu-20.04-live-server-amd64.iso
+
+
+								3번)Client >> Kubuntu를 KDE 그래픽 환경으로 설치
+									https://cdimage.ubuntu.com/kubuntu/releases/20.04/release/   에서 	kubuntu-20.04.6-desktop-amd64.iso 다운
+
+								4번) WinClient >> 얘는 윈도우 기반이라 지금이 아님
+
+
+					: guest os 의 cd/dvd 로 iso 파일 넣기
+						: iso 파일 다 준비됬음 가상 머신 power on 하고 player-removable device - cd/dvd(sata) - settings 들어간다 
+							: device status 의 connected , connect at power on 둘 다 모두 체크한다
+								: 
+							: connection 에서 use physical drive 가 아닌 use iso image file 을 클릭하고 만들어 놓은 iso 파일의 경로를 입력
+								: 주의 - 모든ㄴ 설정이 완료 된 후엔 physical drive 로 다시 전환해야됨(안그럼 다시 power on 할때마다 설정한 경로의 iso 파일이 새로 불러와져서 그동안 설정했던거 다 날라가는거임)
+		: Ubuntu desktop 설치 
+			: settings - displays - resolution : 해상도 설정
+			: 해상도설정 다했음 바탕화면에 있는 ubuntu 20.04 LTS 설치 눌러서 하드디스크에 설치를 진행
+				:키보드 레이아웃에서는 쌩 korean 택(뒤에 뭐 달려있는거 말고)
+				:일반설치 하고 ubuntu 설치 ㅈ중 업데이트 다운로드 체크박스는 해제함(예제 상 20.04 버전으로 해야되서 그렇다)
+				: "디스크를지우고Ubuntu설치"가 "아닌!!" 기타를 택
+					: 직접 파티션을 나눌꺼임
+				: 이 장치에 빈 파티션을 새로 만드시겠습니까?-계속하기 클릭 
+					: 빈 파티션에서 원하는 대로 공간 나누는거 진행할꺼임
+			: 남은공간 선택-밑의+버튼 클릭 >> 파티션만들기 
+				: 크기
+				: 새 파티션의 종류
+					:주
+					:논리
+				: 새 파티션의 위치
+					: 이 공간이 시작하는 지점
+					: 이 공간이 끝나는 ㅈ지점
+					: 용도 
+						: 스왑영역
+						: EXT4 저널링 파일 시스템
+							: 마운트 위치
+
+ 			: 파티션 다 나눴음 <지금설치> 버튼 클릭
+				: 당신은 누구십니까? >>
+					: 이름 ) ??
+					: 컴터 이름 ) 가상 컴터 이름
+					: 사용자 이름 선택) guest 사용자의 이름 입력
+					: 암호 선택) guest 사용자의 암호 입력
+					: 로그인
+						: 자동으로
+						: 암호입력으로 >> 로그인 할때마다 암호 입력해야됨
+
+			: 다 됬음 재부팅(ctrl + alt + insert) 해줌
+
+		:: Ubuntu desktop 설정
+			: 재부팅 다 되면 기본적으로는 guest 로 로그인 하는거임(guest 의 암호 입력)
+				: 추후 root 사용자로 로그인 하는거로 설정 변경 가능
+					: 근데 비추
+			: 실습 상 업그레이드 하긴 거절
+
+
+		: root(리눅스 관리자) 활성화 하기
+			: root == 리눅스 관리자
+				: ubuntu 는 일반적으로 root 를 사용자로 하여 직접 로그인하여 환경을 설정하지 않고, guest 로 로그인 된 상태서 sudo 명령으로 root의 권한으로 작업 진행. 예제에서는 sudo 로 간접적 권한 실행하는 것과 직접 root 로 로그인 하는거 둘 다 해보겠음
+
+					: root 사용자 권한 실행 및 비밀번호 설정
+						: 오른쪽 버튼 클릭 후 open in terminal 해서 터미널 창 오픈
+							: 프롬프트 창이 $ == 게스트 상태 , 
+								: 명령어
+									sudo su - root
+										: (현재 guest 사용자 암호 입력하여) 사용자를 root 로 전환
+							: 프롬프트 창이 # == root 상태
+								: 명령어
+									passwd
+										: root 사용자의 password 설정, 업데이트
+
+					: 실제로 root 사용자로 로그인 하게 하기
+						: 설정-사용자  에서 자동 로그인으로 변경
+							: 아직은 guest 사용자로 로그인 되있는 상태라 변경 위해 비밀번호 입력하는 창에 guest1234 비번 입력해야됨
+		
+						: 다시 터널 창 오픈
+							: 명령어
+								nano /etc/gdm3/custom.conf
+									: 나노 에디터로 etc/gdm3 의 환경설정 변경하겠단 말
+									: 수정
+										: [daemon] 영역의 주석 처리부분 아래 두문장 중 젤 마지막 문장인 "AutomaticLogin = 게스트사용자명" 를  "AutomaticLogin = root" 로 변경
+										: [security] 영역에 새로 AllowRoot = True 입력
+									: 다 했음 변경사항 저장하고 종료
+
+								nano /etc/pam.d/gdm-password
+									: 나노 에디터로 etc/pam.d 의 ...? 뭔 의민진 ... 잘 
+										: 수정
+										: 맨 앞서 3번째줄(auth required pam_succeed_if.so != root quiet_success) 을 주석처리(#붙이기) 
+									: 다했음 변경사항 저장후 종료
+
+								nano /etc/pam.d/gdm-autologin
+									: 나노 에디터로 /etc/pam.d 자동로그인 설정하겠다 뭐 그런거 
+									: 수정
+										: 맨 앞서 3번째줄(auth required pam_succeed_if.so != root quiet_success) 주석처리
+									: 다 했움 저장후종료
+
+								reboot
+									: 재부팅
+
+		: 리눅스 솦웨어 업뎃 정지하기 & 원하는 버전으로 업뎃되게 하기
+			:  일단 솦웨어&업뎃 보라색 아이콘 클릭 - 업데이트 에서
+				: 자동 업뎃확인 - 하지 않기
+				: 새 우분투버전알려주기 - 하지 않기
+
+			: 터미널 창
+				:명령어	
+					cd / etc/apt
+						: apt 디렉터리로 이동
+						: ls 해보면 sources.list 라는 파일이 있는데 이 파일을 업뎃하면 업뎃되는거임
+						
+					mv sources.list sources.list.back 
+						: sources.list 를 완전 삭제하진 않고, sources.list.back 로 이름을 변경하여 저장하여 다시 백업 가능하게 함
+						: ls 해보면 sources.list 라는 파일명으로 존재하는 파일이 없으니 업뎃이 되지 않게된거임
+
+					wget http://dw.hanbit.co.kr/ubuntu/20.04/sources.list
+						: 원하는 버전의 sources.list 를 새로 다운받는다
+						: wget 뒤엔 다운 받을 수 있는 링크 씀된다
+							: ftp 서버에 접속해 다운받게 된다
+					
+					apt update
+						: 학습하는데 필요한 파일을 업뎃
+
+					exit
+						:할꺼다했으니 빠져나욤			
+
+		: IP 주소를 변경하기
+			: 유선연결됨 - 유선네트워크 설정 클릭 (아님 걍 설정 - 네트워크 로 해도 됨)
+				: 연결됨 옆의 톱니바퀴 아이콘 클릭 >> 케이블 연결 창 뜸
+					: IPv4 탭에서
+						: 자동(DHCP) - 자동 ip 부여
+
+						:IPv4 방식 - 직접 수동으로 ip 부여
+							: 주소 
+								: 주소 = 앞서 가상머신에 부여했던 ip 주소 (..... . 111.100, .... . 111.200  )
+								: 네트마스크 = 255.255.255.0 으로
+								: 게이트웨이 = 
+							: 네임서버(dns)  = 게이트 웨이랑 똑같이 설정						
+
+
+
+
+		: 참고
+			: floppy ) 옛날 컴터서  있는것ㅅ. 안뜴수 0.
+			: 
+			
+
+
+
+우분투 리눅스
+	: 리눅스 배포판 ) 리눅스 커널에 여러 응용프로그램 조합해서 회사들이 자신 이름 붙여 판매/배포 하는것
+		:리눅스 커널 ) 현제 제어하는 하드웨어를 제어하는 코드. 정보 등이 들어있음 
+			:리눅스 커널 아카이브에서 다운 받을 수 있음
+				: https://www.kernel.org
+
+		: 우분투 리눅스 ) 대표적인 리눅스 배포판중 하나인 데비안(Debian) 리눅스를 기초로 GNOME 데스크톱 환경을 사용하는 리눅스 배포판
+			: 패키지 설치, 업글 단순. apt 프로그램 통해 솦웨 섶치나 엎뎃 등이 자동으로 이뤄짐
+		 		:APT (advanced package tool)
+					: 데비안 계열의 리눅스 베포판서 패키지 관리를 위한 도구
+					: 기능
+						1. 패키지 설치, 제거
+ 						2. 의존성 관리 : 패키지간의 의존성을 자동으로 해결해준다(해당 패키지가 필요로 하는 라이브러리를 자동 설치, 업글 해준다)
+						3. 업데이트
+						4. 패키지 정보 검색, 조회
+
+			:버전 해석20.04 >> 2020년도 04월	발매
+
+GNU (그누) 프로젝트
+ 	: 솦웨어 사용, 수정, 재배포 대한 자유 
+		: 소스 공개를 하고(라이선스 등록 하고) 사용에 대한 돈은 내야된다(저작권)...?
+	
+우분투 배포판
+	종류:
+		우분투 desktop 용 : x 윈도우 환경 제공+ 다양한 gui 툴
+		우분투 server 용 :(우리가 만든 폴더의 server 를 의미하는게 아니라 그냥 server 그 개념 자체를 말하는거임) : x윈도우 환경을 제공하지 않음(필요시 추가로 설치 가능)
+
+		기타: 쿠분투, 우분투 기린 , 루분투 .....
+
+
+
+
+
+
+
+
+
+			
+
+각 게스트 pc 에 가상 ip를 부여하고 이가 빠져나갈 수 있도록 dns 를 만들어서 빠져 나가야된다
+
+
+
+
+
+
+
+ip 확인법:
+	: cmd들어감 
+cd\ : 루트폴더로 이동
+cd 상대경로 혹은 절대 경로 : 거길로 이동
+cd . , .. : 새로고침, 이전위치
+dir : 현제 디렉토리에 있는거 표시
+ipconfig /all : ip 확인
+	:" 이더넷어댑터 VMware Network Adapter VMnet1 " 은 그냥 냅둠
+	:" 이더넷어댑터 VMware Network Adapter VMnet8 "의 dhcp 주소에서 값 확인
+		:  3번쨰 값을 111로 vm pro로바꿀꼬임 (그냥 예제임)
+
+호스트os
+	: 실제ip가 있음
+	 : 가상ip가 자동 할당되어있음
+
+dhcp 서버: 알아서  ip 값이 할당 안되어있는 애들한테 ip 부여
+	: Client, WInClient
+	: 동적할당ip == 자동ip
+
+직접 ip 부여 : 고정되있다.
+	: 
+
+서브넷마스크: 
+게이트웨이 겸 dns 서버:
+
+iso 파일
+	: 뭘 연결시키지. 가상의 cd rom 에서 파일을 읽어들일수있게하자
+	: Server 만들때 하드 디스크 용량 .. dvd 그런거 설치 했었는데 그걸 iso로 압축하고 , c드라이브의 tmp로 옮겨두고, 자동 실행되게 설정하자
+	; 확장자는 .iso
+	: 가상드라이브 mount 하기를 버튼(오른쪽 클릭 .없으면 알집 설치하든가)통하여 가상 환경으로 불러드려짐
+	
+Sever Power on 하고 removealbe device >> cd/drive sata >> setting 클릭
+	: 우분투 , 윈도우 같은 .iso 파일 다운 받는다
+	: 이전까지는 Server 의 하드디스크만 설정하고 os 는 설정 안한것
+	: connection 을 ISO image file 로 바꿈 (기본 체크된 Physical drive 는 실제로 있는 걸 하겠다는 건데 우리는 가상환경만들어서 그거 쓰려는 거니까)
+
+
