@@ -1,0 +1,36 @@
+
+
+  1. Server 
+   - 계정자 : ubuntu  / 비번 : guest1234
+
+   - 계정자 : root  / 비번 : password1234
+
+
+  - 계정자 추가 :  이름 Honggildong
+                        pc이름  Honggildong
+                        비번 / usertest@1234
+
+===================================
+
+  2. Server(B)
+
+    - 계정자 : ubuntu  / 비번 : ubuntu1234
+   
+    - 계정자 : root  / 비번 : password1234
+
+===================================
+
+3. Client - Kubunt
+
+   - 계정자 : Ubuntu  / 비번 : ubuntu1234
+
+
+===================================
+4. WinClient
+  
+    - 계정자 : WinClient  / 비번 : win1234
+
+  
+   
+
+   
