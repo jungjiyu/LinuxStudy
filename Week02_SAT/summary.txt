@@ -1,0 +1,228 @@
+
+
+
+vm pro 와 player 에서 ip 설정하는 것의 차이? 
+	: pro 는 3번째 자리 변경, player 는 4번째 자리 변경? 이게 뭔 차이?
+
+iso 파일 >> physical 로 변경하는 시점?
+	:
+---------------------------------
+서버b >> client >>winclient os설치
+
+설치 후 머릿속에서 과감히 다 지우고 개별 스터디
+
+
+SERVER
+	: ㄱㅖ정자 추가
+		이름 , pc 이름 :Honggildong / 비번: usertest@1234
+
+
+설정-사용자
+	: 사용자추가-표준
+		honggildong , usertest@1234 , 추가
+
+	: 사실 user add 라는 명령어로도 실행 가능한데 x 윈도우에서 해본것
+
+
+			
+윈도우10 엔터프라이즈 한국어버전 32비트 로 iso 파일 다운로드 
+
+
+우분트 리눅스 서버b 설치
+	: x 윈도우를 사용하지 않고 텍스트 모드로만 사용할 것
+		: x윈도우 자체는 일부 운영 프로그램이라 원하면 나중에 설치 가능'
+
+server(B):
+	: edit machine
+		: cd / dvd 에서 iso 파일 사용하기 누르고 live-server-amd64 택
+			:desktop 이 아니라 live server 이다
+
+	: 실행 시키면 설치를 진행시킴
+		; 중간중간 오류메시지 뜨는데 괜춘
+	: 다 설치되면 뜨는 화면 
+		: 마우스 사용 못하고 TAB 키와 방향키, 엔터만 사용 가능
+		: ENGlish - continue without updating
+		: ens  == 네트웍 인터페이스 카드
+			: 이더넷 네트웍의 약자
+			: 물리적이진 않은 논리적인 장치임
+		: 웍스테이션 pro 에서 111 잡았기 때문에 3번째는 111 임
+
+	: 다 done 누름
+	: storage 설정
+		: swap 영역 == 쓰레기 채워질 공간
+		: sda 영역 == 가상머신 있는 공간
+			: 리눅스계열선 a ,b ,c ... 로 나뉘어짐(윈도우는 c , d ...)
+	: continue
+	: profile setup
+		: your name  >> 개발자 이름
+		: your server's name >> 가상 머신명
+		: pick a user name >> 가상머신 사용자 이름
+		: choose a pswd >> 비밀번호 설정
+
+	: ssh(시큐어 쉘 . 주고 받는 내영을 암호화 하는 부분) 
+		: 걍 암것도 선택 안하고 done 누르기
+		: tty (터미널) 
+
+	: 계속 done 누름
+	
+
+	: reboot 하기 됬음 엔터 누르고 로그인하기
+	
+	: $ == 관리자 권한 없는 일반 사용자일떄의 프롬프트 창
+		: 명령어	
+			halt -p
+	: edit 창에서 iso 에서 physical 로 바꿈
+	
+
+	: 다시 power on
+	:
+		cd /etc/apt
+			ls 해보면 sources.list 있는거 확인 가능
+
+		sudo mv sources.list sources.list.back
+			잠깐 권한자 권한 사용하여 sources.list 를 sources.list.back 로 변경
+		
+		sudo wget 다운로드 링크
+			잠깐 권한자 권한 사용하여 원본 sources.list 다운로드
+
+		sudo apt update
+			apt 업데이트
+
+
+	:점검
+		ip addr
+			: ip 주소 확인
+			: lo 	 (loop back)
+				: 로컬상의. 실제 컴터의 ip 값?
+			:ens
+				: 우리가 200 으로 변경해야되느 대상
+
+		ip a
+			: ip addr 이랑 크게 다를건 없는데 좀 다름
+
+
+	: ip 주소 바꾸기
+		cd /etc/netplan
+			ls 해보묜 00-installer-config.yaml 파일 하나밖에 없음
+				:ens 네트웍 기본적으로 설정해주는 파일
+		sudo nano  00-installer-config.yaml 	
+			:중간중간 탭 쓰면서(자동완성 기능활용) 쓰면 입력하기 쉬음
+			:dhcp4: true >> ip 값 이 자동할당 된다.
+				: 수정
+					dhcp4: no
+					addresses : [192.168.111.200/24]
+					gateway4: 192.168.111.2
+					nameservers:
+						addresses: [192.168.111.2]
+
+			: 설명
+				: netplan
+					: 네트워크 인터페이스 대한 정적 ip 주소를 설정하는 데 사용		
+					: yaml == aint markup language
+
+				ens32 == 설정할 네트워크 인터페이스의 이름
+				/24 == 서브넷 마스크
+				nameservers : dns 서버 관련 설정
+		reboot
+			
+		ip addr
+			: 확인해보면 200 으로 잘 바뀌어져있음
+
+	: 관리자 계정으로 로그인 되게 하기
+		sudo su - root
+			: su == switch user
+		passwd
+			: 패스워드 설정
+
+		reboot
+
+	: 인터냇 욘결 잘 됬는지 확인하는 법
+		root 쳐서 login 할때 root 로 하고  pswd 도 root 비밀번호 입력하기>> 관리자 로그인
+		ping -c 10 www.google.com
+			: ping 	
+				: 네틍웍 상태 확인 위해 사용되는 명령어. 지정된 호스트에 icmp 패킷날리고 돌아온 시간 측정
+					: 시간 작을 수록 잘 되는 것
+			: icmp
+				: 인터넷 컨트록 메시지 프로토콜
+				: 네트워크서 메시지를 교환하는데 사용되니ㅡㄴ 프로토콜 중 하나
+					: 프로토콜 ) http 같은 거. 너와 내가 자료를 전송하기 위한 규칙 같은거
+			: -c 옵션
+				: 몇번 보낼걵 ㅣ 횟수 지정
+
+			: -s 옵션
+				: 몇 바이트 씩 ㄴ날리겠다
+
+			: -t 옵션
+				: 응답 기다리는 시간 설정
+
+			: -i 옵션
+				: 특정 시간간격으로 정보 날림	
+
+	방화벽 설치
+		ufw enable
+			: 우분투방화벽 활성화
+		cd /etc/apt
+			: apt 디렉터리로 이동
+		apt -y install net-tools
+			: 필수 패키지 설치
+		halt -p
+			: poweroff
+		shutdown
+			:poweroff 기능
+		intit0 
+			: 하지 마라
+
+		
+	메모리를 줄이겠다. 왜? 설치는 다 끝났으니까
+	그리고 physical 로 바꾼다(iso 에서)
+
+
+
+
+	스냅숏
+		: file - open - .vmx 파일 열기
+			:하드웨어적인거 불러올때 이 파일 갖져오는것.
+	
+
+----------
+	쿠분투 설치하기	
+		: client 의 edit - cd/dvd - iso 파일애서 Kubuntu 택
+ 		: play 했을때 나오는 창 초기 설정
+			: 한국어 , kubuntu 설치하기 택
+			: 키보드 레이아웃 - 그대로 냅둠
+			: 업데이트 - 업데이트 다운로드 체크박스 해제
+			: 설치 형식 - 그대로
+			: 계속하기
+			: 
+
+		: 특이하게 화면을 드래그로 움직일 수 있음
+		: 설정 메뉴가 밑에 톱니바퀴 모양임ㅁ
+			: 컴퓨터 - 시스템설정 에서 해상도 설정 가능
+
+		: 기본 패키지 설정
+			: 톱니바퀴- 터미널창
+				cd /etc/apt
+					: ls 해서 뭐있나 확인 가능
+				sudo mv sources.list sources.list.back
+				sudo apt update
+				sudo -y install net-tools
+
+				halt -p 종료
+					
+			: dhcp 값으로 자동 설정되게 함
+				: netplan 으로 설정함
+
+--------------------------------
+	윈도우 설치
+		ISO 파일 경로 설정
+		play
+			: 106 키보드로 변경
+			: 업데이트 안함 선택
+			: 계속
+			: 로컬 로 로그임
+탭키 > 자동완성 기능
+ctrl c : 중단 
+
+ctrl alt + f1~6 	
+	: 
+
