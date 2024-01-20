@@ -1,0 +1,197 @@
+질문:
+	92쪽,125쪽 your name 과 pick a user name 의 차이
+	135 쪽 client 가상 컴터에는 왜 root 관련 설정 안해줌? (ip 관련 설정은 dhcp 자동 할당이라 안한다 쳐도)
+
+---------------------------------------------------------------------------
+
+iso 체크 박스 해제 시점 >> 터미널로 모든 설정 완료한 후(ip 까지 설정 완) 완제품 단계일때
+---------------------------------------------------------------------------
+server(B) 설치
+	: x윈도우를 사용하지 않고 텍스트 모드에서만 사용
+		:TUI 기반이다(text user interface)
+		: 프로그램이 가볍다
+		: x윈도우 == 리눅스 운영체제 응용프로그램.
+			: GUI 기반
+
+	: ubuntu-20.04-live-server-amd64.iso 파일을 edit 의 cd/dvd 란의 iso 파일에서 연다
+		: 우분투 데스크탑 버전이 아니라 우분투 서버 버전인거다
+			: 우분투 데스크탑 버전엔 x윈도우 들어있다
+
+	: power on 하고 최초 초기 설정
+		: 한국어 없어서 영어로 기본 진행한다
+		: 아이디 설정 창 나올때까지 죄다 done / continue 누른다
+		: 아이디 설정한다
+		: 또 죄다 done 누른다
+		: 설치 창에 reboot 버튼 뜰때까지 존버하고 reboot 버튼 나옴 눌러서 재부팅한다
+		: 다시 power on 하고 엔터 누르란 문구 나오면 누른다
+			: 위에 [FAILED] failed unmounting/cdrom 이란 문구 뜨는데 뜨는게 정상이다. 걍 엔터 눌러랴
+
+	: 재부팅 후 다시 power on
+		: 처음에 로그인은 guest os 로 로그인된다 >> guest os 암호로 로그인한다
+
+	: 기본적인 우분투 리눅스 환경 설정 - 업데이트 파일 바꾸기
+		: 명령어
+			cd /etc/apt 
+				: 솦웨어 설치와 관련된 파일이 저장된 디렉토리로 이동
+				ls 해봄 sources.list 파일이 있다
+
+			 sudo mv sources.list sources.list.back
+				: 현재 게스트 os 로 로그인 되어있는 상태니까 sudo 를 통해 잠시 관리자 권한을 빌려온다는 의미로 sudo
+				: 기존 sources.list 를 삭제하되 혹시라도 다시 필요할 수 있으니 백업용으로 다른 이름으로 저장해둔다
+	
+			sudo wget http://dw.hanbit.co.kr/ubuntu/20.04/sources.list 
+				: 실습에 필요한 버전의 sources.list 를 다운받는다
+
+			sudo apt update
+				: advanced package tool 을 업데이트 시킨다
+			
+
+	: 게스트 pc에 IP 주소를 설정하기
+		: 명령어
+			ip addr
+				: 나온 문구 중에서 ens32 부분의 ip 를 확인한다
+					: 앞서 VMware pro에서 3번째 자리를 111 로 고정했으니 192.168.111.XXX로 주소가 나온다
+				: ip a 명령어로도 가능하고, 이때는 현제 인터페이스(장치) 관련 ip 정보를 확인 가능하다
+			
+			cd /etc/netplan
+				: netplan == 네트워크 인터페이스 대한 정적 ip 주소를 설정하는데 사용되는 파일
+				: ls 해보면 확장자가 yaml 인 파일이 있다
+					: netplan 설정파일의 확장자가 yaml 이다
+
+			sudo nano 00-installer-config.yaml
+				:  00-installer-config.yaml 파일을 편집한다
+				: 수정 내용
+					: 기존 00-installer-config.yaml 파일 내용
+						#This is the network config written by 'subsiquity'
+						network:
+					           ethernets:
+						      ens32:
+							 dhcp4: true
+                                                     version: 2
+						
+							: 내용 해석
+								: network == Netplan 설정의 시작을 나타냄
+								: version == Netplan 설정의 버전 지정
+								: ethernets == 네트워크 인터페이스 대한 설정을 시작
+								: ens32 == 네트워크 인터페이스 중 하나
+								: "네트워크" "인터페이스"인 "ens32"의 "dhcp4"를 true 로 설정되어있어 자동으로 IP 주소를 할당 받는단 뜻이고, 별도의 설정 없이도 네트워크가 작동된다.  
+
+					: 바꾼 내용
+						#This is the network config written by 'subsiquity'
+						network:
+					           ethernets:
+						      ens32:
+							 dhcp4: no
+							 addresses: [192.168.111.200/24]
+						         gateway4: 192.168.111.2
+                                                         nameservers:
+								addresses: [192.168.111.2]
+                                                     version: 2
+
+								: 주석문 바로 밑 부분에 아래 내용을 입력하는데 띄어쓰기 틀리면 좆되는거다
+							: 내용 해석
+								: addresses == 인터페이스에 할당할 정적 ip 주소를 나타냄
+								: [192.168.111.200/24] 에서 /24 == 서브넷 마스크
+								: gateway4 == 게이트웨이(시스템이 외부와 통신하기 위한 경로)의 IP 주소 지정하는거
+								: nameservers == dns 서버에 대한 설정
+								
+			ip addr
+				: ip 제대로 바뀌었는지 확인한다
+
+			ping -c 10 www.google.com
+				: 네트워크 연결이 잘 됬는지 확인. google 로 ping을 10번 보내겠단 뜻
+				: ping == 네트워크 상태를 확인하기 위해 사용되는 명령어로, 지정된 호스트(사이트주소) 에 ICMP 패킷을 보내고 응답 시간을 측정	
+					: ICMP 
+						: internet control message protocol
+						: 네트워크에서 메시지를 교환하는데 사용되는 프로토콜.규약.
+ 
+				
+
+	: 관리자 root 의 비번을 지정하기
+		: 명령어		
+			sudo su - root
+				: 관리자로 계정 전환 (su == switch user)
+				: 이거 하면 비번 입력하라 하는데 초기에 설정했던 게스트 사용자의 비번 입력함 된다
+
+			 passwd
+				: 관리자의 비밀번호를 지정한다
+				
+			reboot
+				: 다 했음 reboot 한다
+
+		: 관리자의 비번까지 생성했으면 관리자 계정ㅇ까지 만들어진거라 이제 초기에 로그인 할때 관리자로 로그인 가능하다( 처음에 root 입력하고(사용자명), 설정한 관리자 비번으로 로그인) 
+
+
+	: 방화벽 설정하기
+		cd /etc/netplan 
+		ufw enable 
+			:관리자로 로그인 된 상태아니면 sudo 명령어 사용해서 함 됨
+		cd /etc/apt
+		apt -y install net-tools
+			: 필수 패키지 설치
+
+		halt -p
+			: power off
+
+	: 메모리 조정하기
+		: 설치할 거 다 설치했으니까 메모리 좀 줄여도 된다
+		: edit 창에서 memory 를 1MGB 에서 512MGB 로 줄인다 (1/2)
+	
+	: 할 꺼 다했으니까 edit 창에서 connect at power on 해제하고  iso 파일을 physical 로 돌린다
+	: 이제 스냅숏 찍어서 혹시 모를 불상사에 대비하여 백업본을 만들어둔다
+
+
+			
+	
+
+
+			
+쿠분투 리눅스 설치( 우리 예제에서 Client 가상머신에 해당)
+	: edit 창에서 kubuntu - ... desktop-... iso 파일 택
+		: desktop 버전이니까 x 윈도우 쓰는거다
+
+	: power on 하고 초기 설정
+		: kubuntu 체험하기 아닌 kubuntu 설치하기를 누른다
+		: 업데이트 표시 해제한다
+		: 설치 형식에서는 '자동-디스크 전체사용' 을 택한다
+			: 바뀐 점을 디스트에 쓰시겠습니까 - 계속하기 누른다
+
+		: 누구 십니까 뜸 니 정보 입력한다.
+	
+	: 밑의 톱니바퀴 아이콘 눌러서 컴터설정 가능하고, 터미널도 열 수 있다
+
+	: 업데이트 파일 원하는 버전으로 바꿔치기
+		: 터미널 창 열고 명령어
+			cd /etc/apt
+				: ls 해봄 sources.list 파일 있다
+	 		sudo mv sources.list sources.list.back
+				: 지금 게스트 로그인 상태니까 sudo 명령어 쓴ㄴ다
+
+			sudo wget http://dw.hanbit.co.kr/ubuntu/20.04/sources.list
+				: sources.list를 새로 다운 받는다
+
+			sudo apt update
+				: 새로 다운 받은 sources.list 를 사용하여 apt 를 업데이트 한다
+
+			sudo apt -y install net-tools
+				: 필수 패키지 설치도 한다
+
+			halt -p
+				: 컴터 끈다(power off)
+
+		
+	: 설치될껀 다 설치된 상태니 메모리 조절 및 iso 에서 physical 로 돌림
+		: ㅇㅇ 그렇게 함 된다
+
+	: 스냅숏 찍는다
+			
+
+: window 10 os 설치( WinClient 가상 컴터 설치)
+	: iso 파일을 window 10 32 비트 엔터프라이즈 한국어 버전 iso 파일로 한다
+
+	: power on 하고 기본 설정
+		: 뭐 기본적인거 알아서 하시고
+		: 설치 유형을 선택하세요 에서 사용자 지정(windows만 설치) 선택
+		: 잡다구리 설정
+		: 다했음 컴터 끄고 나옴
+	: 스냅숏 찍기
